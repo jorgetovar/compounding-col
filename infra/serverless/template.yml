@@ -5,7 +5,7 @@ Resources:
   ApiGateway:
     Type: AWS::Serverless::Api
     Properties:
-      Name: ApiGateway
+      Name: CompoundingApi
       StageName: Prod
       TracingEnabled: true
       Cors:
