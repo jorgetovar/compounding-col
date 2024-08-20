@@ -230,10 +230,11 @@ Resources:
   # account on your behalf, such as updating your load balancer with the
   # details of where your containers are, so that traffic can reach your
   # containers.
-  EcsServiceRole:
+  ECSServiceRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
@@ -246,6 +247,7 @@ Resources:
       Policies:
         - PolicyName: ecs-service
           PolicyDocument:
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
@@ -295,6 +297,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
@@ -304,6 +307,7 @@ Resources:
       Policies:
         - PolicyName: AmazonECSTaskRolePolicy
           PolicyDocument:
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
@@ -340,6 +344,7 @@ Resources:
     Properties:
       RoleName: CompoundingServiceCodePipelineServiceRole
       AssumeRolePolicyDocument:
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
@@ -351,6 +356,7 @@ Resources:
       Policies:
         - PolicyName: CompoundingService-codepipeline-service-policy
           PolicyDocument:
+            Version: '2012-10-17'
             Statement:
               - Action:
                   - s3:GetObject
@@ -372,7 +378,6 @@ Resources:
                   - iam:PassRole
                 Resource: "*"
                 Effect: Allow
-            Version: "2012-10-17"
 
   # An IAM role that allows the AWS CodeBuild service to perform the actions
   # required to complete a build of our source code retrieved from CodeCommit,
@@ -464,17 +469,14 @@ Resources:
       Policies:
         - PolicyName: "CompoundingServiceExecutionPolicy"
           PolicyDocument:
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
-                  - ecs:CreateCluster
-                  - ecs:DeregisterTaskDefinition
-                  - ecs:ListTasks
+                  - ecs:*
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                  - ecr:GetAuthorizationToken
-                  - ecr:BatchCheckLayerAvailability
-                  - ecr:GetDownloadUrlForLayer
+                  - ecr:* # Allow the ECS tasks to interact with ECR
                 Resource: "*"
 
   CompoundingTaskRole:
@@ -491,12 +493,11 @@ Resources:
       Policies:
         - PolicyName: "CompoundingTaskExecutionPolicy"
           PolicyDocument:
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
-                  - ecr:GetAuthorizationToken
-                  - ecr:BatchCheckLayerAvailability
-                  - ecr:GetDownloadUrlForLayer
+                  - ecr:* # Allow the ECS tasks to interact with ECR
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: "*"
@@ -545,7 +546,6 @@ Resources:
     Type: AWS::ECS::Service
     DependsOn:
       - CompoundingListener
-      - CompoundingTargetGroup
     Properties:
       Cluster: !Ref CompoundingCluster
       LaunchType: FARGATE
@@ -584,7 +584,7 @@ Outputs:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CurrentAccount' ] ]
   EcsServiceRole:
     Description: The ARN of the ECS Service role
-    Value: !GetAtt 'EcsServiceRole.Arn'
+    Value: !GetAtt 'ECSServiceRole.Arn'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'EcsServiceRole' ] ]
   ECSTaskRole:

@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: ApiGateway
+      StageName: Prod
+      TracingEnabled: true
+      Cors:
+        AllowMethods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,X-Amz-Security-Token,Authorization,X-Api-Key,X-Requested-With,Accept,Access-Control-Allow-Methods,Access-Control-Allow-Origin,Access-Control-Allow-Headers,X-Api-Version, X-Game-version'"
+        AllowOrigin: "'*'"
+
+  # DynamoDB table to store user data
+  CompoundingTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: CompoundingTable
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+
+  # Lambda function to interact with DynamoDB
+  GetItemsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: GetItemsFunction
+      Handler: main
+      Runtime: go1.x
+      CodeUri: ./backend/functions/GetItemsFunction/
+      MemorySize: 128
+      Timeout: 10
+      Environment:
+        Variables:
+          COMPOUNDING_TABLE_NAME: !Ref CompoundingTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CompoundingTable
+      Events:
+        ApiGatewayGET:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /
+            Method: GET
+
+  # Log group for Lambda function
+  GetItemsFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${GetItemsFunction}
+      RetentionInDays: 7
+
+Outputs:
+  GetItemsFunction:
+    Description: "Lambda Function Name"
+    Value: !Ref GetItemsFunction
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
