@@ -437,8 +437,8 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      ExecutionRoleArn: !Ref CompoundingServiceRole
-      TaskRoleArn: !Ref CompoundingTaskRole
+      ExecutionRoleArn: !Ref ECSServiceRole
+      TaskRoleArn: !Ref ECSTaskRole
       ContainerDefinitions:
         - Name: Compounding-Service
           Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/compounding/service:latest"
@@ -453,59 +453,6 @@ Resources:
               awslogs-stream-prefix: awslogs-compounding-service
           Essential: true
 
-  CompoundingServiceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - ecs.amazonaws.com
-                - ecs-tasks.amazonaws.com
-            Action: sts:AssumeRole
-      Path: "/"
-      Policies:
-        - PolicyName: "CompoundingServiceExecutionPolicy"
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ecs:*
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                  - ecr:* # Allow the ECS tasks to interact with ECR
-                Resource: "*"
-
-  CompoundingTaskRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-            Action: sts:AssumeRole
-      Path: "/"
-      Policies:
-        - PolicyName: "CompoundingTaskExecutionPolicy"
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ecr:* # Allow the ECS tasks to interact with ECR
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                Resource: "*"
-              - Effect: Allow
-                Action:
-                  - dynamodb:Query
-                  - dynamodb:GetItem
-                Resource: "arn:aws:dynamodb:*:*:table/CompoundingTable*"
 # Network Load Balancer
 
   CompoundingLoadBalancer:

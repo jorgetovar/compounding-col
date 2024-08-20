@@ -53,7 +53,6 @@ Resources:
   # Log group for Lambda function
   GetItemsFunctionLogGroup:
     Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${GetItemsFunction}
       RetentionInDays: 7

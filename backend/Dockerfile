@@ -1,4 +1,5 @@
-FROM golang:1.18-alpine AS builder
+# Build stage
+FROM --platform=linux/amd64 golang:1.18-alpine AS builder
 
 WORKDIR /go/src/app
 
@@ -10,7 +11,8 @@ COPY ./service/ .
 
 RUN go build -o app .
 
-FROM alpine AS app
+# Runtime stage
+FROM --platform=linux/amd64 alpine AS app
 
 COPY --from=builder /go/src/app/app /bin/app
 
