@@ -33,7 +33,7 @@ Resources:
       FunctionName: GetItemsFunction
       Handler: main
       Runtime: go1.x
-      CodeUri: ./backend/functions/GetItemsFunction/
+      CodeUri: ./functions/GetItemsFunction/
       MemorySize: 128
       Timeout: 10
       Environment:

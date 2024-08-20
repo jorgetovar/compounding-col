@@ -8,6 +8,7 @@
 # Go workspace
 bin/
 pkg/
+.aws-sam/
 
 # Terraform state files
 *.tfstate
