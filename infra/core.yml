@@ -456,7 +456,9 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: ecs.amazonaws.com
+              Service:
+                - ecs.amazonaws.com
+                - ecs-tasks.amazonaws.com
             Action: sts:AssumeRole
       Path: "/"
       Policies:
@@ -470,7 +472,11 @@ Resources:
                   - ecs:ListTasks
                   - logs:CreateLogStream
                   - logs:PutLogEvents
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
                 Resource: "*"
+
   CompoundingTaskRole:
     Type: AWS::IAM::Role
     Properties:
