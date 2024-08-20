@@ -1,0 +1,18 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+.idea/
+
+# Go workspace
+bin/
+pkg/
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Others
+.DS_Store
+.env
