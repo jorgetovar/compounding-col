@@ -220,9 +220,11 @@ Resources:
       GroupDescription: Access to the fargate containers from the Internet
       VpcId: !Ref 'VPC'
       SecurityGroupIngress:
-        # Allow access to NLB from anywhere on the internet
+        # Allow TCP traffic on port 8080 from the NLB (0.0.0.0/0 means all IPs)
         - CidrIp: 0.0.0.0/0
-          IpProtocol: -1
+          FromPort: 8080
+          ToPort: 8080
+          IpProtocol: tcp
 
   # This is an IAM role which authorizes ECS to manage resources on your
   # account on your behalf, such as updating your load balancer with the
@@ -409,7 +411,156 @@ Resources:
                   - "ecr:InitiateLayerUpload"
                   - "ecr:GetAuthorizationToken"
                 Resource: "*"
+# Cluster resources
+  CompoundingCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: Compounding-Cluster
 
+  CompoundingLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: compounding-logs
+      RetentionInDays: 7
+
+  CompoundingTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: compounding-service
+      Cpu: '256'
+      Memory: '512'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref CompoundingServiceRole
+      TaskRoleArn: !Ref CompoundingTaskRole
+      ContainerDefinitions:
+        - Name: Compounding-Service
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/compounding/service:latest"
+          PortMappings:
+            - ContainerPort: 8080
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref CompoundingLogsGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: awslogs-compounding-service
+          Essential: true
+
+  CompoundingServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: "CompoundingServiceExecutionPolicy"
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecs:CreateCluster
+                  - ecs:DeregisterTaskDefinition
+                  - ecs:ListTasks
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+  CompoundingTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: "CompoundingTaskExecutionPolicy"
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - dynamodb:Query
+                  - dynamodb:GetItem
+                Resource: "arn:aws:dynamodb:*:*:table/CompoundingTable*"
+# Network Load Balancer
+
+  CompoundingLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: compounding-nlb
+      Scheme: internet-facing
+      Type: network
+      Subnets:
+        - !Ref PublicSubnetOne
+        - !Ref PublicSubnetTwo
+
+  CompoundingTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: Compounding-TargetGroup
+      Port: 8080
+      Protocol: TCP
+      TargetType: ip
+      VpcId: !Ref VPC
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 3
+
+  CompoundingListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref CompoundingTargetGroup
+      LoadBalancerArn: !Ref CompoundingLoadBalancer
+      Port: 80
+      Protocol: TCP
+
+  CompoundingService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - CompoundingListener
+      - CompoundingTargetGroup
+    Properties:
+      Cluster: !Ref CompoundingCluster
+      LaunchType: FARGATE
+      ServiceName: Compounding-Service
+      TaskDefinition: !Ref CompoundingTaskDefinition
+      DesiredCount: 1
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 0
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref FargateContainerSecurityGroup
+          Subnets:
+            - !Ref PrivateSubnetOne
+            - !Ref PrivateSubnetTwo
+      LoadBalancers:
+        - ContainerName: Compounding-Service
+          ContainerPort: 8080
+          TargetGroupArn: !Ref CompoundingTargetGroup
 
 # These are the values output by the CloudFormation template. Be careful
 # about changing any of them, because of them are exported with specific
@@ -475,3 +626,12 @@ Outputs:
     Value: !GetAtt 'CompoundingServiceCodePipelineServiceRole.Arn'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CompoundingServiceCodePipelineServiceRole' ] ]
+  ClusterName:
+    Description: The name of the ECS Cluster.
+    Value: !Ref CompoundingCluster
+  TaskDefinitionArn:
+    Description: The ARN of the task definition.
+    Value: !Ref CompoundingTaskDefinition
+  LogsGroup:
+    Description: The name of the CloudWatch Logs Group.
+    Value: !Ref CompoundingLogsGroup
