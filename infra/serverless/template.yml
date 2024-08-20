@@ -17,7 +17,7 @@ Resources:
   CompoundingTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: CompoundingTable
+      TableName: CompoundingTableSls
       AttributeDefinitions:
         - AttributeName: PK
           AttributeType: S
@@ -30,9 +30,9 @@ Resources:
   GetItemsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: GetItemsFunction
-      Handler: main
-      Runtime: go1.x
+      FunctionName: GetItemsFunctionV1
+      Handler: bootstrap
+      Runtime: provided.al2
       CodeUri: ./functions/GetItemsFunction/
       MemorySize: 128
       Timeout: 10
