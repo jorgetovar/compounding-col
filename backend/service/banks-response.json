@@ -1,0 +1,34 @@
+{
+  "colombianBanks": [
+    {
+      "name": "Bancolombia"
+    },
+    {
+      "name": "Banco de Bogotá"
+    },
+    {
+      "name": "Davivienda"
+    },
+    {
+      "name": "Banco de Occidente"
+    },
+    {
+      "name": "Banco Popular"
+    },
+    {
+      "name": "Banco Agrario"
+    },
+    {
+      "name": "BBVA Colombia"
+    },
+    {
+      "name": "Scotiabank Colpatria"
+    },
+    {
+      "name": "Banco AV Villas"
+    },
+    {
+      "name": "Banco Itaú"
+    }
+  ]
+}
