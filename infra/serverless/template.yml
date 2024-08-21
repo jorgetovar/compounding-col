@@ -29,8 +29,10 @@ Resources:
   # Lambda function to interact with DynamoDB
   GetItemsFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
     Properties:
-      FunctionName: GetItemsFunctionV1
+      FunctionName: GetItemsFunction
       Handler: bootstrap
       Runtime: provided.al2
       CodeUri: ./functions/GetItemsFunction/

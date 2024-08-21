@@ -588,3 +588,7 @@ Outputs:
   LogsGroup:
     Description: The name of the CloudWatch Logs Group.
     Value: !Ref CompoundingLogsGroup
+  # Load balancer endpoint
+  LoadBalancerDNSName:
+    Description: The DNS name of the load balancer
+    Value: !GetAtt CompoundingLoadBalancer.DNSName
