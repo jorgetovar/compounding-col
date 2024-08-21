@@ -33,6 +33,7 @@ Resources:
       BuildMethod: makefile
     Properties:
       FunctionName: GetItemsFunction
+      Architectures: ["arm64"]
       Handler: bootstrap
       Runtime: provided.al2
       CodeUri: ./functions/GetItemsFunction/
