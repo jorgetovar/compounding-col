@@ -37,7 +37,7 @@ Resources:
       Handler: bootstrap
       Runtime: provided.al2
       CodeUri: ./functions/GetItemsFunction/
-      MemorySize: 128
+      MemorySize: 512
       Timeout: 10
       Environment:
         Variables:
