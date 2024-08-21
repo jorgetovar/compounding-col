@@ -1,0 +1,11 @@
+config:
+  target: "{{ $processEnvironment.API_URL }}"  # Target URL fetched from environment variable
+  phases:
+    - duration: 300  # Duration of the test in seconds (5 minutes)
+      arrivalRate: 100  # Arrival rate of 100 requests per minute
+
+scenarios:
+  - name: "Get products"
+    flow:
+      - get:
+          url: "/"  # Endpoint to be tested

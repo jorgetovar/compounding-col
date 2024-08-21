@@ -85,16 +85,16 @@ lint: $(STATICCHECK)
 	@gofmt -d -s $(GO_FILES) 2>&1 | tee lint.log
 	@echo "Checking vet..."
 	@$(foreach dir,$(MODULE_DIRS),(cd $(dir) && go vet ./... 2>&1) &&) true | tee -a lint.log
-	@echo "Checking staticcheck..."
+	@echo "Checking static-check..."
 	@$(foreach dir,$(MODULE_DIRS),(cd $(dir) && $(STATICCHECK) ./... 2>&1) &&) true | tee -a lint.log
-	@echo "Checking for unresolved FIXMEs..."
+	@echo "Checking for unresolved FIX MEs..."
 	@git grep -i fixme | grep -v -e Makefile | tee -a lint.log
 	@[ ! -s lint.log ]
 	@rm lint.log
 	@echo "Checking 'go mod tidy'..."
 	@make tidy
 	@if ! git diff --quiet; then \
-		echo "'go diff tidy' resulted in chnges or working tree is dirty:"; \
+		echo "'go diff tidy' resulted in changes or working tree is dirty:"; \
 		git --no-pager diff; \
 	fi
 
