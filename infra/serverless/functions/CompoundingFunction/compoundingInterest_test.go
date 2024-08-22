@@ -1,15 +1,9 @@
 package main
 
 import (
-	"math"
 	"reflect"
 	"testing"
 )
-
-func round(value float64, precision int) float64 {
-	scale := math.Pow(10, float64(precision))
-	return math.Round(value*scale) / scale
-}
 
 func TestCalculateCompoundInterest(t *testing.T) {
 	principal := 100000000.0
