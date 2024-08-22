@@ -2,7 +2,7 @@
 
 ## Why Another Go Tutorial
 
-AWS has been deprecating several services and runtimes recently. As we’ve seen with the discontinuation of our beloved CodeCommit and other crucial services, it’s become clear that Go1.x is no longer supported for AWS Lambda functions.
+AWS has been deprecating several services and runtimes recently. As we’ve seen with the discontinuation of our beloved CodeCommit and other crucial services, Go1.x is no longer supported for AWS Lambda functions.
 
 If you try to deploy most of the outdated tutorials, you might encounter errors like this:
 
