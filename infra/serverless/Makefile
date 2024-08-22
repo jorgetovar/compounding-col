@@ -9,8 +9,6 @@ GO := go
 CC := aarch64-linux-gnu-gcc
 GCCGO := aarch64-linux-gnu-gccgo-10
 
-ci: build tests-unit
-
 build:
 		${MAKE} ${MAKEOPTS} $(foreach function,${FUNCTIONS}, build-${function})
 
