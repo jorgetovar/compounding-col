@@ -18,6 +18,8 @@ func HelloHandler(ctx context.Context, event events.APIGatewayProxyRequest) (eve
 		Message: "Hello, World!",
 	}
 
+	CalculateCompoundInterest(200_000_000, 10, 10)
+
 	// Marshal the response object to JSON
 	body, err := json.Marshal(helloMessage)
 	if err != nil {
