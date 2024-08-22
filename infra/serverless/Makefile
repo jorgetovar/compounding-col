@@ -1,5 +1,5 @@
 STACK_NAME ?= serverless-go-demo
-FUNCTIONS := GetItemsFunction
+FUNCTIONS := CompoundingFunction
 REGION := us-west-2
 
 # To try different version of Go

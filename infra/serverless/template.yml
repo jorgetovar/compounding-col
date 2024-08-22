@@ -27,16 +27,16 @@ Resources:
           KeyType: HASH
 
   # Lambda function to interact with DynamoDB
-  GetItemsFunction:
+  CompoundingFunction:
     Type: AWS::Serverless::Function
     Metadata:
       BuildMethod: makefile
     Properties:
-      FunctionName: GetItemsFunction
+      FunctionName: CompoundingFunction
       Architectures: ["arm64"]
       Handler: bootstrap
       Runtime: provided.al2
-      CodeUri: ./functions/GetItemsFunction/
+      CodeUri: ./functions/CompoundingFunction/
       MemorySize: 512
       Timeout: 10
       Environment:
@@ -46,24 +46,24 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref CompoundingTable
       Events:
-        ApiGatewayGET:
+        ApiGatewayPost:
           Type: Api
           Properties:
             RestApiId: !Ref ApiGateway
-            Path: /
-            Method: GET
+            Path: /compounding
+            Method: POST
 
   # Log group for Lambda function
-  GetItemsFunctionLogGroup:
+  CompoundingFunctionLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/lambda/${GetItemsFunction}
+      LogGroupName: !Sub /aws/lambda/${CompoundingFunction}
       RetentionInDays: 7
 
 Outputs:
-  GetItemsFunction:
+  CompoundingFunction:
     Description: "Lambda Function Name"
-    Value: !Ref GetItemsFunction
+    Value: !Ref CompoundingFunction
   ApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
