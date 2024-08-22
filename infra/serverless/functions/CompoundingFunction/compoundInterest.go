@@ -9,12 +9,12 @@ func round(value float64, precision int) float64 {
 
 func CalculateCompoundInterest(principal float64, annualRate float64, years int) []float64 {
 	rateDecimal := annualRate / 100
-	amountsPerYear := make([]float64, years)
+	gainsPerYear := make([]float64, years)
 
 	for year := 1; year <= years; year++ {
 		principal = principal * (1 + rateDecimal)
-		amountsPerYear[year-1] = round(principal, 2)
+		gainsPerYear[year-1] = round(principal, 2)
 	}
 
-	return amountsPerYear
+	return gainsPerYear
 }

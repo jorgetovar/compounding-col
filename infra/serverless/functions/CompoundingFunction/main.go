@@ -10,8 +10,8 @@ import (
 
 // Response is the structure for the response JSON
 type Response struct {
-	Message string    `json:"message"`
-	Amounts []float64 `json:"amounts"`
+	Message      string    `json:"message"`
+	GainsPerYear []float64 `json:"gainsPerYear"`
 }
 
 type Request struct {
@@ -28,11 +28,11 @@ func HelloHandler(ctx context.Context, event events.APIGatewayProxyRequest) (eve
 		return createResponse(400, "Invalid request body")
 	}
 	fmt.Println("Request", req)
-	amounts := CalculateCompoundInterest(req.Principal, req.AnnualRate, req.Years)
-	fmt.Println(amounts)
+	gainsPerYear := CalculateCompoundInterest(req.Principal, req.AnnualRate, req.Years)
+	fmt.Println(gainsPerYear)
 	response := Response{
-		Message: "Calculation successful",
-		Amounts: amounts,
+		Message:      "Calculation successful",
+		GainsPerYear: gainsPerYear,
 	}
 	// Marshal the response object to JSON
 	body, err := json.Marshal(response)
