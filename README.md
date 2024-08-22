@@ -1,12 +1,7 @@
-# Compounding-Col
-
-## Overview
-
-This is an open-source project that includes:
+# Build Go Serverless REST APIs and Deploy to AWS using the SAM framework
 
 - **Backend**: Implemented in Go
-- **Infrastructure**: Managed with Terraform
-- **Frontend**: TBD
+- **Infrastructure**: Managed with SAM
 
 ## License
 
