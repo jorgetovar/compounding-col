@@ -39,6 +39,7 @@ Resources:
       CodeUri: ./functions/CompoundingFunction/
       MemorySize: 512
       Timeout: 10
+      Tracing: Active
       Environment:
         Variables:
           COMPOUNDING_TABLE_NAME: !Ref CompoundingTable
